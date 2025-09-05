@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCart } from "./CartContext";
 
 import { CatalogGrid } from "./ui/components/CatalogGrid";
@@ -15,21 +15,38 @@ const mockProducts = Array.from({ length: 30 }).map((_, i) => ({
 })); //mockProducts = [{id:1,title:"Sản phẩm #1",price:120000,category:"Áo",image:"https://picsum.photos/seed/ui0/300/200"},...{id:30,...}]
 
 export default function App() {
+  const [products, setProducts] = useState([]);
   const [q, setQ] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("Tất cả");
+  const [selectedCategory, setSelectedCategory] = useState("All");
   const [maxPrice, setMaxPrice] = useState(0);
   const { cart, addToCart, removeFromCart, clearCart, changeQty } = useCart();
 
-
-  const filteredProducts = mockProducts.filter(product => {
+useEffect(() => {
+  fetch("https://dummyjson.com/products")
+    .then(res => res.json())
+    .then(data => {
+       
+      setProducts(data.products.map((p, i) => ({
+        ...p,
+        image: `https://picsum.photos/seed/ui${i}/300/200`
+      })));
+    });
+}, []);
+const categories = ["All"];
+products.forEach(product => {
+  if (!categories.includes(product.category)) {
+    categories.push(product.category);
+  }
+});
+  const filteredProducts = products.filter(product => {
   let dungTuKhoa = true;
   if (q !== "") {
     dungTuKhoa = product.title.toLowerCase().includes(q.toLowerCase());
   }
 
   let dungDanhMuc = true;
-  if (selectedCategory !== "Tất cả") {
-    dungDanhMuc = product.category === selectedCategory;
+  if (selectedCategory !== "All") {
+    dungDanhMuc = product.category == selectedCategory;
   }
 
   let dungGia = true;
@@ -47,14 +64,14 @@ export default function App() {
             <FiltersBar
               q={q}
               onChangeQ={setQ}
-              categories={["Tất cả", "Áo", "Quần"]}
+              categories={categories}
               selectedCategory={selectedCategory}
               onChangeCategory={setSelectedCategory}
               maxPrice={maxPrice}
               onChangeMaxPrice={setMaxPrice}
             />
             <CatalogGrid products={filteredProducts} onAdd={(id)=>{
-              const prod = mockProducts.find(p=>p.id===id);
+              const prod = products.find(p=>p.id===id);
               if (prod) addToCart(prod);
             }} />
           </>
@@ -76,9 +93,9 @@ export default function App() {
       } />
       <Route path="/product/:id" element={
         <ProductDetailView
-          product={mockProducts}
+          product={products}
           onAdd={(id)=>{
-            const prod = mockProducts.find(p=>p.id===id);
+            const prod = products.find(p=>p.id===id);
             if (prod) addToCart(prod);
           }}
           onBack={()=>{}}

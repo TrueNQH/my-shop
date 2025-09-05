@@ -8,13 +8,13 @@ export function CartTable({ items = [], total = 0, onQtyChange, onRemove, onClea
           <tbody>{items.map((it)=>(
             <tr key={it.id}>
               <td className="cart-prod"><img src={it.image} alt={it.title}/><span>{it.title}</span></td>
-              <td>{it.price} đ</td>
+              <td>{it.price} $</td>
               <td><input type="number" min="1" className="qty" value={it.qty} onChange={(e)=>onQtyChange(it.id,Number(e.target.value))} /></td>
-              <td>{it.lineTotal} đ</td>
+              <td>{it.lineTotal} $</td>
               <td><button className="btn danger" onClick={()=>onRemove(it.id)}>Xóa</button></td>
             </tr>))}</tbody>
         </table>
-        <div className="checkout"><div>Tổng cộng: <b>{total} đ</b></div>
+        <div className="checkout"><div>Tổng cộng: <b>{total} $</b></div>
           <div className="row"><button className="btn danger" onClick={onClear}>Xoá giỏ</button></div>
         </div>
       </>) }
